@@ -28,11 +28,9 @@ proc_headers = $(addprefix processors/, \
 	check-tx-slave-v3-proc.h \
 	putfs-proc.h \
 	putcommit-v2-proc.h \
-	putcommit-v3-proc.h \
 	recvcommit-v3-proc.h \
 	putcs-v2-proc.h \
-	checkbl-proc.h \
-	checkff-proc.h)
+	checkbl-proc.h)
 
 proc_headers += ../common/processors/putblock-v2-proc.h
 
@@ -92,17 +90,15 @@ seaf_server_SOURCES = \
 	processors/putfs-proc.c \
 	../common/processors/putblock-v2-proc.c \
 	processors/putcommit-v2-proc.c \
-	processors/putcommit-v3-proc.c \
 	processors/recvcommit-v3-proc.c \
 	processors/putcs-v2-proc.c \
-	processors/checkbl-proc.c \
-	processors/checkff-proc.c
+	processors/checkbl-proc.c
 
 seaf_server_LDADD = @CCNET_LIBS@ \
 	$(top_builddir)/lib/libseafile_common.la \
 	$(top_builddir)/common/index/libindex.la \
 	@GLIB2_LIBS@ @GOBJECT_LIBS@ -lssl @LIB_RT@ @LIB_UUID@ -lsqlite3 -levent \
 	$(top_builddir)/common/cdc/libcdc.la \
-	@SEARPC_LIBS@ @ZDB_LIBS@ @CURL_LIBS@ ${LIB_WS32}
+	@SEARPC_LIBS@ @ZDB_LIBS@ @RADOS_LIBS@ @CURL_LIBS@ ${LIB_WS32}
 
 seaf_server_LDFLAGS = @STATIC_COMPILE@ @SERVER_PKG_RPATH@

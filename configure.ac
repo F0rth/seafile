@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 
 AC_PREREQ(2.61)
-AC_INIT([seafile], [2.0.8], [freeplant@gmail.com])
+AC_INIT([seafile], [2.0.7], [freeplant@gmail.com])
 AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -87,6 +87,9 @@ if test "$blinux" = true; then
    AC_ARG_ENABLE(riak, AC_HELP_STRING([--enable-riak], [enable riak backend]),
       [compile_riak=$enableval],[compile_riak="no"])
 
+   AC_ARG_ENABLE(ceph, AC_HELP_STRING([--enable-ceph], [enable ceph backend]),
+      [compile_ceph=$enableval],[compile_ceph="no"])
+
    AC_ARG_ENABLE(fuse, AC_HELP_STRING([--enable-fuse], [enable fuse virtual file system]),
       [compile_fuse=$enableval],[compile_fuse="yes"])
 fi
@@ -142,6 +145,7 @@ AM_CONDITIONAL([COMPILE_CLIENT], [test "${compile_client}" = "yes"])
 AM_CONDITIONAL([COMPILE_SERVER], [test "${compile_server}" = "yes"])
 #AM_CONDITIONAL([COMPILE_SEABLOCK], [test "${compile_seablock}" = "yes"])
 AM_CONDITIONAL([COMPILE_RIAK], [test "${compile_riak}" = "yes"])
+AM_CONDITIONAL([COMPILE_CEPH], [test "${compile_ceph}" = "yes"])
 AM_CONDITIONAL([COMPILE_FUSE], [test "${compile_fuse}" = "yes"])
 
 AM_CONDITIONAL([WIN32], [test "$bwin32" = "true"])
@@ -192,7 +196,6 @@ if test "$bwin32" = true; then
   LIB_IPHLPAPI=-liphlpapi
   LIB_SHELL32=-lshell32
   LIB_PSAPI=-lpsapi
-  LIB_MAC=
   MSVC_CFLAGS="-D__MSVCRT__ -D__MSVCRT_VERSION__=0x0601"
 elif test "$bmac" = true ; then
   LIB_WS32=
@@ -205,7 +208,6 @@ elif test "$bmac" = true ; then
   LIB_SHELL32=
   LIB_PSAPI=
   MSVC_CFLAGS=
-  LIB_MAC="-framework CoreServices"
 else
   LIB_WS32=
   LIB_GDI32=
@@ -216,7 +218,6 @@ else
   LIB_IPHLPAPI=
   LIB_SHELL32=
   LIB_PSAPI=
-  LIB_MAC=
   MSVC_CFLAGS=
 fi
 
@@ -229,7 +230,6 @@ AC_SUBST(LIB_UUID)
 AC_SUBST(LIB_IPHLPAPI)
 AC_SUBST(LIB_SHELL32)
 AC_SUBST(LIB_PSAPI)
-AC_SUBST(LIB_MAC)
 AC_SUBST(MSVC_CFLAGS)
 
 
@@ -319,6 +319,15 @@ if test "${compile_riak}" = "yes"; then
    AC_SUBST(CURL_CFLAGS)
    AC_SUBST(CURL_LIBS)
    AC_DEFINE([RIAK_BACKEND], [1], ["define if support Riak backend"])
+fi
+
+if test "${compile_ceph}" = "yes"; then
+   AC_CHECK_LIB(rados, rados_create, [with_rados=yes],
+       AC_MSG_ERROR([*** Unable to find librados]), )
+   echo "found rados"
+   RADOS_LIBS="-lrados"
+   AC_SUBST(RADOS_LIBS)
+   AC_DEFINE([HAVE_RADOS], [1], ["define if have rados"])
 fi
 
 AM_CONDITIONAL([HAVE_KEYSTORAGE_GK], [test "${compile_gnome_keyring}" = "yes"])
