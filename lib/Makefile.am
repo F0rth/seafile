@@ -1,10 +1,8 @@
-pcfiles = libseafile.pc
-pkgconfig_DATA = $(pcfiles)
-pkgconfigdir = $(libdir)/pkgconfig
 
 AM_CPPFLAGS = @GLIB2_CFLAGS@ -I$(top_srcdir)/include \
 	-I$(top_srcdir)/lib \
 	-I$(top_srcdir)/common \
+	-DG_LOG_DOMAIN=\"Seafile\" \
 	@CCNET_CFLAGS@ \
 	@SEARPC_CFLAGS@ \
 	@MSVC_CFLAGS@ \
@@ -18,7 +16,7 @@ seafile_object_define = repo.vala commit.vala dirent.vala dir.vala \
 
 seafile_object_gen = $(seafile_object_define:.vala=.c)
 
-EXTRA_DIST = ${seafile_object_define} rpc_table.py $(pcfiles)
+EXTRA_DIST = ${seafile_object_define} rpc_table.py
 
 utils_headers = net.h rsa.h bloom-filter.h utils.h db.h
 
@@ -51,11 +49,11 @@ libseafile_la_LIBADD = @GLIB2_LIBS@  @GOBJECT_LIBS@ @SEARPC_LIBS@
 
 noinst_LTLIBRARIES = libseafile_common.la
 
-libseafile_common_la_SOURCES = ${seafile_object_gen} ${utils_srcs}
+libseafile_common_la_SOURCES = ${seafile_object_gen} ${utils_srcs} ../common/block-backend-swift.c
 libseafile_common_la_LDFLAGS = -no-undefined
 libseafile_common_la_LIBADD = @GLIB2_LIBS@  @GOBJECT_LIBS@ -lssl -lcrypto @LIB_GDI32@ \
 				     @LIB_UUID@ @LIB_WS32@ @LIB_PSAPI@ -lsqlite3 \
-					 -levent @SEARPC_LIBS@ @LIB_SHELL32@
+					 -levent @SEARPC_LIBS@ @LIB_SHELL32@ -lcurl
 
 searpc_gen = searpc-signature.h searpc-marshal.h
 
@@ -69,10 +67,3 @@ ${searpc_gen}: $(top_srcdir)/lib/rpc_table.py
 clean-local:
 	rm -f ${searpc_gen}
 	rm -f $(top_srcdir)/lib/rpc_table.pyc
-
-install-data-local:
-if MACOS
-	${SED} -i '' -e "s|(DESTDIR)|${DESTDIR}|g" $(pcfiles)
-else
-	${SED} -i "s|(DESTDIR)|${DESTDIR}|g" $(pcfiles)
-endif
