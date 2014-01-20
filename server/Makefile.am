@@ -27,9 +27,10 @@ proc_headers = $(addprefix processors/, \
 	check-tx-slave-v2-proc.h \
 	check-tx-slave-v3-proc.h \
 	putfs-proc.h \
-	putcommit-v2-proc.h \
+	putcommit-v3-proc.h \
 	recvcommit-v3-proc.h \
 	putcs-v2-proc.h \
+	checkff-proc.h \
 	checkbl-proc.h)
 
 proc_headers += ../common/processors/putblock-v2-proc.h
